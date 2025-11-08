@@ -1,0 +1,136 @@
+# WHU-SSIDE: Satellite Stereo Image Disparity Estimation
+
+The WHU-SSIDE data and codes of Meta-MRGE.
+
+## 📖 Overview
+
+WHU-SSIDE is a comprehensive project focused on satellite stereo image disparity estimation, featuring a high-quality dataset and advanced disparity estimation algorithms. This project addresses two major challenges in satellite stereo disparity estimation: limitations in dataset quality and diversity, and the difficulty of achieving synergistic optimization across large-scale and small-scale disparity regions.
+
+
+## 🎯 Key Features
+#### 🌟 WHU-SSIDE Dataset
+
+*Large Scale*:   Contains 3,737 satellite stereo image pairs
+
+*Challenging Scenes*:   Specifically includes high-rise building zones with enormous disparities
+
+*High-precision Ground Truth*:   Incorporates a multi-error compensation mechanism ensuring sub-pixel accuracy (MAE < 1 pixel)
+
+*High Reliability*:   Establishes a highly reliable and challenging benchmark for satellite stereo disparity estimation
+
+[Dataset-google drive](https://drive.google.com/drive/folders/1-E1LT_HW_qB0g7gqBh4wKPQskVMuzM85?usp=sharing)
+
+[Dataset-baidu drive](https://pan.baidu.com/s/1EFb0GjTrHj38thRKgJm-ow)    Access code: `whus`
+
+
+#### 🚀 Meta-MRGE Algorithm
+
+*Metadata Guidance*:   Embeds satellite imaging parameters to guide high-precision disparity estimation
+
+*Multi-range Geometric Encoding*:   Constructs multi-level geometry-aware cost volume
+
+*Iterative Refinement*:   Implements iterative disparity refinement
+
+
+
+### 📊 Performance Highlights
+
+| Metric | WHU-SSIDE | WHU-Stereo |
+|--------|-----------|------------|
+| EPE    | 1.2585    | 0.2265     |
+| RMSE   | 4.2812    | 0.2492     |
+
+#### Results on WHU-SSIDE Dataset
+
+*End-Point Error (EPE)*:   1.2585 (lowest)
+
+*Root Mean Square Error (RMSE)*:   4.2812 (lowest)
+
+##### Results on WHU-Stereo Dataset
+
+*D1 Metric*:   3.01% improvement over second-best method
+
+*EPE*:   Improvement of 0.2265
+
+*RMSE*:   Improvement of 0.2492
+
+> **Note**: The method shows significant improvements in large-disparity regions. Ablation studies confirm that the metadata embedding mechanism enhances feature matching robustness.
+
+
+```
+WHU-SSIDE/
+
+├── 📦 Dataset/                    # Dense matching dataset (cloud storage links)
+│   ├── download_links.md          # Dataset download instructions
+│   ├── dataset_structure.md       # Dataset structure documentation
+│   └── usage_guidelines.md        # Usage guidelines
+|
+├── 🔧 StereoDatasetConstruction/  # Dataset construction code
+│   ├── src/                       # Source code
+│   ├── scripts/                   # Construction scripts
+│   ├── configs/                   # Configuration files
+│   └── README.md                  # Construction documentation
+|
+├── 🤖 Dense_Matching_Model/       # Dense matching model code
+│   ├── src/                       # Model source code
+│   ├── configs/                   # Training configurations
+│   ├── weights/                   # Pre-trained weights
+│   └── README.md                  # Model usage documentation
+|
+├── 📚 Docs/                       # Documentation
+│   ├── paper.pdf                  # Research paper
+│   ├── citation.bib               # Citation information
+│   └── tutorial.md                 # Tutorial documentation
+|
+└── 📄 LICENSE                     # License file
+```
+
+## 🚀 Quick Start
+
+#### 1. Dataset Download
+
+[Dataset-google drive](https://drive.google.com/drive/folders/1-E1LT_HW_qB0g7gqBh4wKPQskVMuzM85?usp=sharing)
+
+[Dataset-baidu drive](https://pan.baidu.com/s/1EFb0GjTrHj38thRKgJm-ow)    Access code: `whus`
+
+
+#### 2. Environment Setup
+
+``` pip install -r requirements.txt ```
+
+#### 3. Model Training
+
+```
+cd Dense_Matching_Model
+
+python train.py --config configs/train_config.yaml
+```
+
+
+## 🤝 Contributing
+
+The numerical calculations in this article have been done on the supercomputing system in the Supercomputing Center, Wuhan University, Wuhan, China.
+
+We welcome contributions from the community! You can contribute by:
+1. Submitting issues for bug reports or feature requests
+2. Creating pull requests to improve the codebase
+3. Sharing use cases and experimental results
+
+## 📄 License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+## 📞 Contact
+
+- Project Homepage: [GitHub Repository](https://github.com/zhanggb1997/WHU-SSIDE)
+- Issue Tracker: [GitHub Issues](https://github.com/zhanggb1997/WHU-SSIDE/issues)
+- Email: [zhanggb1997@whu.edu.cn]
+
+---
+
+<div align="center">
+  
+**🌟 If this project is helpful to you, please give us a star!** ⭐
+
+</div>
+
