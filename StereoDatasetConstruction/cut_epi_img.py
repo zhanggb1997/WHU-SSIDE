@@ -13,10 +13,8 @@ import math
 import os
 from copy import deepcopy
 from datetime import datetime
-
 import cv2
 import xml.dom.minidom
-
 import numpy as np
 
 shift_ = 0
@@ -249,63 +247,12 @@ def main_cut_epi_imgs(ImgLPath, ImgRPath, DispPath=None, sub_size=1024, repeat_s
     cut_epi_imgs(ImgL, ImgR, Disp, sub_size, repeat_size, xmlL, xmlR, SavePath, SaveSuffix)
 
 
-# for i in range(7, 8):
-#     print('\n\n***************' + str(i) + "***************")
-#     xmlR_path = r"/home/dshare/01Data/3DDisp/LiDAR/America/images/GF7_DLC_W88.1_N42.0_20210917_L1A0000565411/new/GF7_DLC_W88.1_N42.0_20210917_L1A0000565411-BWDPAN.xml"
-#     xmlL_path = r"/home/dshare/01Data/3DDisp/LiDAR/America/images/GF7_DLC_W88.1_N42.0_20210917_L1A0000565411/new/GF7_DLC_W88.1_N42.0_20210917_L1A0000565411-FWDPAN.xml"
-#     imgL_path = r"/home/dshare/01Data/3DDisp/LiDAR/America/epi_res/3-1/GF7_DLC_W88.1_N42.0_20210917_L1A0000565411_{}-1/eimgL_transp.tif".format(i)
-#     imgR_path = r"/home/dshare/01Data/3DDisp/LiDAR/America/epi_res/3-1/GF7_DLC_W88.1_N42.0_20210917_L1A0000565411_{}-1/eimgR_transp_transf.tif".format(i)
-#     disp_path = r"/home/dshare/01Data/3DDisp/LiDAR/America/epi_res/3-1/GF7_DLC_W88.1_N42.0_20210917_L1A0000565411_{}-1/epiDisp_transp.tif".format(i)
-#     save_path = r"/home/dshare/01Data/3DDisp/LiDAR/America/epi_res/3-1/GF7_DLC_W88.1_N42.0_20210917_L1A0000565411_{}-1/cut".format(i)
-#     main_cut_epi_imgs(imgL_path, imgR_path, disp_path, 1024, 256, save_path, "GF7_Dupage_3_{}_F_B".format(i))
 
-
-# for i in range(1, 12):
-#     print('\n\n***************' + str(i) + "***************")
-#     xmlL_path = r"/home/dshare/01Data/3DDisp/LiDAR/America/images/GF7_DLC_W88.2_N41.8_20210917_L1A0000565412/new/GF7_DLC_W88.2_N41.8_20210917_L1A0000565412-BWDPAN.xml"
-#     xmlR_path = r"/home/dshare/01Data/3DDisp/LiDAR/America/images/GF7_DLC_W88.2_N41.8_20210917_L1A0000565412/new/GF7_DLC_W88.2_N41.8_20210917_L1A0000565412-FWDPAN.xml"
-#     imgL_path = r"/home/dshare/01Data/3DDisp/LiDAR/America/epi_res/GF7_DLC_W88.2_N41.8_20210917_L1A0000565412_{}/eimgL_transp.tif".format(i)
-#     imgR_path = r"/home/dshare/01Data/3DDisp/LiDAR/America/epi_res/GF7_DLC_W88.2_N41.8_20210917_L1A0000565412_{}/eimgR_transp_transf.tif".format(i)
-#     disp_path = r"/home/dshare/01Data/3DDisp/LiDAR/America/epi_res/GF7_DLC_W88.2_N41.8_20210917_L1A0000565412_{}/epiDisp_transp.tif".format(i)
-#     save_path = r"/home/dshare/01Data/3DDisp/LiDAR/America/epi_res/GF7_DLC_W88.2_N41.8_20210917_L1A0000565412_{}/cut".format(i)
-#     main_cut_epi_imgs(imgL_path, imgR_path, disp_path, 1024, 256, save_path, "GF7_Dupage_4_{}_B_F".format(i))
-
-# for i in range(1, 5):
-#     print('\n\n***************' + str(i) + "***************")
-#     xmlR_path = r"/home/dshare/01Data/3DDisp/LiDAR/America/images/GF7_DLC_W87.9_N41.8_20210720_L1A0000864854/new2/GF7_DLC_W87.9_N41.8_20210720_L1A0000864854-BWDPAN.xml"
-#     xmlL_path = r"/home/dshare/01Data/3DDisp/LiDAR/America/images/GF7_DLC_W87.9_N41.8_20210720_L1A0000864854/new2/GF7_DLC_W87.9_N41.8_20210720_L1A0000864854-FWDPAN.xml"
-#     imgL_path = r"/home/dshare/01Data/3DDisp/LiDAR/America/epi_res/2-1/GF7_DLC_W87.9_N41.8_20210720_L1A0000864854_{}-1/eimgL_transp.tif".format(i)
-#     imgR_path = r"/home/dshare/01Data/3DDisp/LiDAR/America/epi_res/2-1/GF7_DLC_W87.9_N41.8_20210720_L1A0000864854_{}-1/eimgR_transp_transf.tif".format(i)
-#     disp_path = r"/home/dshare/01Data/3DDisp/LiDAR/America/epi_res/2-1/GF7_DLC_W87.9_N41.8_20210720_L1A0000864854_{}-1/epiDisp_transp.tif".format(i)
-#     save_path = r"/home/dshare/01Data/3DDisp/LiDAR/America/epi_res/2-1/GF7_DLC_W87.9_N41.8_20210720_L1A0000864854_{}-1/cut".format(i)
-#     main_cut_epi_imgs(imgL_path, imgR_path, disp_path, 1024, 256, save_path, "GF7_Dupage_2_{}_F_B".format(i))
-
-# for i in range(2, 4):
-#     print('\n\n***************' + str(i) + "***************")
-#     xmlR_path = r"/home/dshare/01Data/3DDisp/LiDAR/America/images/GF7_DLC_W87.9_N42.0_20210720_L1A0000500901/new/GF7_DLC_W87.9_N42.0_20210720_L1A0000500901-BWDPAN.xml"
-#     xmlL_path = r"/home/dshare/01Data/3DDisp/LiDAR/America/images/GF7_DLC_W87.9_N42.0_20210720_L1A0000500901/new/GF7_DLC_W87.9_N42.0_20210720_L1A0000500901-FWDPAN.xml"
-#     imgL_path = r"/home/dshare/01Data/3DDisp/LiDAR/America/epi_res/1-1/GF7_DLC_W87.9_N42.0_20210720_L1A0000500901_{}-1/eimgL_transp.tif".format(i)
-#     imgR_path = r"/home/dshare/01Data/3DDisp/LiDAR/America/epi_res/1-1/GF7_DLC_W87.9_N42.0_20210720_L1A0000500901_{}-1/eimgR_transp_transf.tif".format(i)
-#     disp_path = r"/home/dshare/01Data/3DDisp/LiDAR/America/epi_res/1-1/GF7_DLC_W87.9_N42.0_20210720_L1A0000500901_{}-1/epiDisp_transp.tif".format(i)
-#     save_path = r"/home/dshare/01Data/3DDisp/LiDAR/America/epi_res/1-1/GF7_DLC_W87.9_N42.0_20210720_L1A0000500901_{}-1/cut".format(i)
-#     main_cut_epi_imgs(imgL_path, imgR_path, disp_path, 1024, 256, save_path, "GF7_Dupage_1_{}_F_B".format(i))
-
-
-# xmlL_path = r"/home/dshare/01Data/3DDisp/LiDAR/America/images/GF7_DLC_W122.3_N37.8_20241015_L1A0001730050/new2-shp/GF7_DLC_W122.3_N37.8_20241015_L1A0001730050-BWDPAN.xml"
-# xmlR_path = r"/home/dshare/01Data/3DDisp/LiDAR/America/images/GF7_DLC_W122.3_N37.8_20241015_L1A0001730050/new2-shp/GF7_DLC_W122.3_N37.8_20241015_L1A0001730050-FWDPAN.xml"
-# imgL_path = r"/home/dshare/01Data/3DDisp/LiDAR/America/epi_res/GF7_DLC_W122.3_N37.8_20241015_L1A0001730050_0/eimgL_transp.tif"
-# imgR_path = r"/home/dshare/01Data/3DDisp/LiDAR/America/epi_res/GF7_DLC_W122.3_N37.8_20241015_L1A0001730050_0/eimgR_transp_transf.tif"
-# disp_path = r"/home/dshare/01Data/3DDisp/LiDAR/America/epi_res/GF7_DLC_W122.3_N37.8_20241015_L1A0001730050_0/epiDisp_transp.tif"
-# save_path = r"/home/dshare/01Data/3DDisp/LiDAR/America/epi_res/GF7_DLC_W122.3_N37.8_20241015_L1A0001730050_0/cut"
-# main_cut_epi_imgs(imgL_path, imgR_path, disp_path, 1024, 256, save_path, "GF7_SanFran_0_0_B_F")
-
-xmlL_path = r"/home/dshare/01Data/3DDisp/LiDAR/America/images/GF7_DLC_W87.6_N42.0_20210804_L1A0000774072/shp/new/GF7_DLC_W87.6_N42.0_20210804_L1A0000774072-BWDPAN.xml"
-xmlR_path = r"/home/dshare/01Data/3DDisp/LiDAR/America/images/GF7_DLC_W87.6_N42.0_20210804_L1A0000774072/shp/new/GF7_DLC_W87.6_N42.0_20210804_L1A0000774072-FWDPAN.xml"
-imgL_path = r"/home/dshare/01Data/3DDisp/LiDAR/America/epi_res/GF7_DLC_W87.6_N42.0_20210804_L1A0000774072_0/LRD/eimgL_transp.tif"
-imgR_path = r"/home/dshare/01Data/3DDisp/LiDAR/America/epi_res/GF7_DLC_W87.6_N42.0_20210804_L1A0000774072_0/LRD/eimgR_transp_transf.tif"
-disp_path = r"/home/dshare/01Data/3DDisp/LiDAR/America/epi_res/GF7_DLC_W87.6_N42.0_20210804_L1A0000774072_0/LRD/epiDisp_transp.tif"
-mask_path = r"/home/dshare/01Data/3DDisp/LiDAR/America/epi_res/GF7_DLC_W87.6_N42.0_20210804_L1A0000774072_0/LRD/mask.tif"
-save_path = r"/home/dshare/01Data/3DDisp/LiDAR/America/epi_res/GF7_DLC_W87.6_N42.0_20210804_L1A0000774072_0/cut"
+xmlL_path = r"../images/GF7_DLC_W87.6_N42.0_20210804_L1A0000774072/shp/new/GF7_DLC_W87.6_N42.0_20210804_L1A0000774072-BWDPAN.xml"
+xmlR_path = r"../images/GF7_DLC_W87.6_N42.0_20210804_L1A0000774072/shp/new/GF7_DLC_W87.6_N42.0_20210804_L1A0000774072-FWDPAN.xml"
+imgL_path = r"../epi_res/GF7_DLC_W87.6_N42.0_20210804_L1A0000774072_0/LRD/eimgL_transp.tif"
+imgR_path = r"../epi_res/GF7_DLC_W87.6_N42.0_20210804_L1A0000774072_0/LRD/eimgR_transp_transf.tif"
+disp_path = r"../epi_res/GF7_DLC_W87.6_N42.0_20210804_L1A0000774072_0/LRD/epiDisp_transp.tif"
+mask_path = r"../epi_res/GF7_DLC_W87.6_N42.0_20210804_L1A0000774072_0/LRD/mask.tif"
+save_path = r"../epi_res/GF7_DLC_W87.6_N42.0_20210804_L1A0000774072_0/cut"
 main_cut_epi_imgs(imgL_path, imgR_path, disp_path, 1024, 512, save_path, "GF7_Cook_0_0_B_F", mask_path)
-if __name__ == '__main__':
-    pass

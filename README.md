@@ -66,8 +66,8 @@ WHU-SSIDE/
 │   └── usage_guidelines.md        # Usage guidelines
 |
 ├── 🔧 StereoDatasetConstruction/  # Dataset construction code
-│   ├── src/                       # Source code
-│   ├── scripts/                   # Construction scripts
+│   ├── rpc/                       # RPC model utils code
+│   ├── image/                     # Remote Sensing image code
 │   ├── configs/                   # Configuration files
 │   └── README.md                  # Construction documentation
 |

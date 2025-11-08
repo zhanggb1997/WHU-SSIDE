@@ -345,23 +345,6 @@ def points_apply_transform(las, matrix):
     transformed_las.z = las.z.astype(np.float32)
     return transformed_las
 
-    # # 创建新文件头
-    # new_header = laspy.LasHeader(point_format=las.header.point_format, version=las.header.version)
-    #
-    # # 写入新文件
-    # new_las = laspy.LasData(new_header)
-    # new_las.header.offsets = [0, 0, 0]
-    # new_las.points.offsets = [0, 0, 0]
-    # new_las.header.scales = [0.01, 0.01, 0.001]  # 像素坐标系
-    # new_las.points.scales = [0.01, 0.01, 0.001]  # 像素坐标系使用更低精度
-    # for dim in las.point_format.dimensions:
-    #     new_las[dim.name] = las[dim.name]
-    # new_las.xyz = np.array([new_x, new_y, las.z]).astype(np.float64).transpose(1, 0)
-    # new_las.x = np.array(new_x).astype(np.float64)
-    # new_las.y = np.array(new_y).astype(np.float64)
-    # new_las.z = las.z
-    #
-    # return new_las
 
 
 def points_apply_3d_transform(las, matrix):

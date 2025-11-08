@@ -23,14 +23,6 @@ import srtm4
 from pyproj import CRS, Transformer
 
 # 读取LAS文件
-# las = laspy.read("/home/dshare/01Data/3DDisp/LiDAR/NJ/I50G084096.las")
-# output_file = "/home/dshare/01Data/3DDisp/LiDAR/NJ/I50G084096_WGS84.las"
-# las = laspy.read("/home/dshare/01Data/3DDisp/LiDAR/NJ/I51G085001.las")
-# output_file = "/home/dshare/01Data/3DDisp/LiDAR/NJ/I51G085001_WGS84.las"
-# las = laspy.read("/home/dshare/01Data/3DDisp/LiDAR/Yinchuan/ot_yinchan_basin_point_cloud_area_5.laz")
-# output_file = "/home/dshare/01Data/3DDisp/LiDAR/Yinchuan/ot_yinchan_basin_point_cloud_area_5_WGS84.las"
-# las = laspy.read("/home/dshare/01Data/3DDisp/LiDAR/XinXiLan/LAS_11258900.las")
-#
 # # 获取头信息
 # header = las.header
 #
@@ -150,7 +142,6 @@ from disp_rectify import read_points
 from points_rectify import compute_affine_matrix, points_apply_transform, compute_3d_affine_matrix, \
     points_apply_3d_transform, compute_3d_polynomial_matrix, points_apply_3d_polynomial_transform, calculate_residuals, \
     xy_apply_transform
-from reprojection_erreo import get_sifts
 
 class SelfLas():
     def __init__(self, x=None, y=None, z=None):
