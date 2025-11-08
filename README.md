@@ -68,8 +68,7 @@ WHU-SSIDE/
 ├── 🔧 StereoDatasetConstruction/  # Dataset construction code
 │   ├── rpc/                       # RPC model utils code
 │   ├── image/                     # Remote Sensing image code
-│   ├── configs/                   # Configuration files
-│   └── README.md                  # Construction documentation
+│   └── main.py                    # Execute main function
 |
 ├── 🤖 Dense_Matching_Model/       # Dense matching model code
 │   ├── src/                       # Model source code
