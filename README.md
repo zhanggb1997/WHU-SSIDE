@@ -20,10 +20,10 @@ WHU-SSIDE is a comprehensive project focused on satellite stereo image disparity
 
 [Dataset-google drive](https://drive.google.com/drive/folders/1-E1LT_HW_qB0g7gqBh4wKPQskVMuzM85?usp=sharing)
 
-[Dataset-baidu drive](https://pan.baidu.com/s/1EFb0GjTrHj38thRKgJm-ow)    Access code: `whus`
+[Dataset-baidu netdisk (百度网盘)](https://pan.baidu.com/s/1EFb0GjTrHj38thRKgJm-ow)    Access code: `whus`
 
 
-#### 🚀 Meta-MRGE Algorithm
+#### 🚀 Meta-MRGE Algorithm 
 
 *Metadata Guidance*:   Embeds satellite imaging parameters to guide high-precision disparity estimation
 
@@ -37,8 +37,9 @@ WHU-SSIDE is a comprehensive project focused on satellite stereo image disparity
 
 | Metric | WHU-SSIDE | WHU-Stereo |
 |--------|-----------|------------|
-| EPE    | 1.2585    | 0.2265     |
-| RMSE   | 4.2812    | 0.2492     |
+| D1     | 8.35%     | 9.74%      |
+| EPE    | 1.2585    | 1.4986     |
+| RMSE   | 4.2812    | 3.6976     |
 
 #### Results on WHU-SSIDE Dataset
 
@@ -67,20 +68,26 @@ WHU-SSIDE/
 |
 ├── 🔧 StereoDatasetConstruction/  # Dataset construction code
 │   ├── rpc/                       # RPC model utils code
-│   ├── image/                     # Remote Sensing image code
-│   └── main.py                    # Execute main function
+│   ├── image/                     # Remote Sensing image process code
+|   .
+|   .
+|   .
+│   └── main.py                    # Execute main function for data construction
 |
-├── 🤖 Dense_Matching_Model/       # Dense matching model code
-│   ├── src/                       # Model source code
-│   ├── configs/                   # Training configurations
-│   ├── weights/                   # Pre-trained weights
-│   └── README.md                  # Model usage documentation
+├── 🤖  DenseMatchingModel/        # Dense matching model code
+│   ├── models/                    # Model source code
+│   ├── data/                      # Training configurations
+│   ├── core/                      # Pre-trained weights
+│   ├── config/                    # Pre-trained weights
+│   ├── utils/                     # Tools
+│   └── main.py                    # Execute main function for dense match model train / inference
 |
 ├── 📚 Docs/                       # Documentation
 │   ├── paper.pdf                  # Research paper
 │   ├── citation.bib               # Citation information
-│   └── tutorial.md                 # Tutorial documentation
+│   └── tutorial.md                # Tutorial documentation
 |
+├── 📄 requirements                # Requirements file
 └── 📄 LICENSE                     # License file
 ```
 
@@ -97,12 +104,12 @@ WHU-SSIDE/
 
 ``` pip install -r requirements.txt ```
 
-#### 3. Model Training
+#### 3. Model Training/Testing
 
 ```
-cd Dense_Matching_Model
+cd DenseMatchingModel
 
-python train.py --config configs/train_config.yaml
+python main.py
 ```
 
 
@@ -132,4 +139,3 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 **🌟 If this project is helpful to you, please give us a star!** ⭐
 
 </div>
-
