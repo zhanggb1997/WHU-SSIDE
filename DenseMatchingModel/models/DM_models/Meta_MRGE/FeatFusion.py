@@ -14,7 +14,12 @@ import torch
 from torch import nn, Tensor
 from torchvision.models.densenet import _DenseBlock
 import torch.nn.functional as F
-from models.DM_models.CSTR.misc import center_crop
+
+def center_crop(layer, max_height, max_width):
+    _, _, h, w = layer.size()
+    xy1 = (w - max_width) // 2
+    xy2 = (h - max_height) // 2
+    return layer[:, :, xy2:(xy2 + max_height), xy1:(xy1 + max_width)]
 
 
 class ConvDown(nn.Module):

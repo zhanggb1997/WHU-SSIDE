@@ -17,7 +17,7 @@ import geographiclib
 def find_corresponding_point(model_a, model_b, x, y, z):
     """
     Finds corresponding points in the second image, given the heights.
-    在给定高度的情况下，查找第二个图像中的对应点。
+
 
     Arguments:
         model_a, model_b: two instances of the rpcm.RPCModel class, or of
@@ -32,8 +32,8 @@ def find_corresponding_point(model_a, model_b, x, y, z):
             yp contains the coordinates of the projection of the 3D point in image
             b.
     """
-    t1, t2 = model_a.localization(x, y, z)  # img1 图像坐标系->地理坐标系
-    xp, yp = model_b.projection(t1, t2, z)  # img2 地理坐标系->图像坐标系
+    t1, t2 = model_a.localization(x, y, z)  # img1
+    xp, yp = model_b.projection(t1, t2, z)  # img2
     return (xp, yp, z)
 
 
@@ -41,7 +41,6 @@ def geodesic_bounding_box(rpc, x, y, w, h):
     """
     Computes a bounding box on the WGS84 ellipsoid associated to a Pleiades
     image region of interest, through its rpc function.
-    通过其rpc函数计算与Pleiades图像感兴趣区域关联的WGS84椭球上的边界框。
 
     Args:
         rpc: instance of the rpcm.RPCModel class
@@ -154,7 +153,7 @@ def min_max_heights_from_bbx(im, lon_m, lon_M, lat_m, lat_M, rpc):
 def altitude_range(rpc, x, y, w, h, margin_top=0, margin_bottom=0):
     """
     Computes an altitude range using the exogenous dem.
-    使用dem计算高度范围。
+
 
     Args:
         rpc: instance of the rpcm.RPCModel class

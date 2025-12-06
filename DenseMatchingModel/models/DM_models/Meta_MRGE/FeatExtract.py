@@ -289,12 +289,9 @@ class SwinTransformerBlock(nn.Module):
                 x_windows = WindowProcess.apply(x, B, H, W, C, -self.shift_size, self.window_size)
         else:
             shifted_x = x
-            # partition windows 使用窗口切分 (B, H, W, C) -> (B*win_num, win_size, win_size, C)
             x_windows = window_partition(shifted_x, self.window_size)  # nW*B, window_size, window_size, C
-        # partition windows 使用窗口切分 (B*win_num, win_size, win_size, C) -> (B*win_num, win_size * win_size, C)
         x_windows = x_windows.view(-1, self.window_size * self.window_size, C)  # nW*B, window_size*window_size, C
 
-        # W-MSA/SW-MSA 窗口-多头自注意力/偏移窗口-多头自注意力  (B*win_num, win_size*win_size, C)
         attn_windows = self.attn(x_windows, mask=self.attn_mask)  # nW*B, window_size*window_size, C
 
         # merge windows (B*win_num, win_size, win_size, C)
@@ -572,7 +569,7 @@ class FeatExtract(nn.Module):
 
     def forward(self, x, mask=None, metas=None, meta_view_mode=None):
         x_raw = x
-        # feature 特征提取
+        # feature
         # (B, C, H, W) -> (B, H / ps * W / ps, C)  C=embed_dim
         x = self.patch_embed(x)
         B, H_W_, C = x.shape
@@ -581,31 +578,6 @@ class FeatExtract(nn.Module):
             meta = self.meta_token(metas, meta_view_mode)
             x = torch.cat((x, meta), 2)
             C = C + 1
-            # meta_tokens = self.meta_token(metas, meta_view_mode)
-
-            # gamma = meta_tokens[0][:, :, :self.cfgs.MODEL.SET.BM.FEATEXTRACT.EMBED_DIM]
-            # beta  = meta_tokens[0][:, :, self.cfgs.MODEL.SET.BM.FEATEXTRACT.EMBED_DIM:]
-            #
-            # x = x * gamma + beta
-            #
-            # # 遍历层提取特征
-            # x_layers = [x_raw]
-            # for layer_no, layer in enumerate(self.layers):
-            #     x = layer(x)
-            #     if layer_no == len(self.layers) - 1:
-            #         x = self.norm(x)
-            #
-            #     gamma = meta_tokens[layer_no+1][:, :, :self.cfgs.MODEL.SET.BM.FEATFUSION.LAYER_CHANNEL[3-layer_no]]
-            #     beta  = meta_tokens[layer_no+1][:, :, self.cfgs.MODEL.SET.BM.FEATFUSION.LAYER_CHANNEL[3-layer_no]:]
-            #
-            #     x = x * gamma + beta
-            #
-            #     x_ = x.view(B, int((H_W_)**0.5/(2**layer_no)), int((H_W_)**0.5/(2**layer_no)), int(C*(2**layer_no))).permute(0, 3, 1, 2)
-            #
-            #     x_layers.append(x_ )
-            #
-            # return x_layers
-
 
         # MIM mask
         if self.MIM:
@@ -631,162 +603,6 @@ class FeatExtract(nn.Module):
         return x_layers
 
 
-class ModalEncoder1(nn.Module):
-    def __init__(self, cfgs):
-        super().__init__()
-
-        self.cfgs = cfgs
-
-        self.embed_dim = self.cfgs.MODEL.SET.BM.FEATEXTRACT.EMBED_DIM
-        self.layer_dim = self.cfgs.MODEL.SET.BM.FEATFUSION.LAYER_CHANNEL
-
-        self.layer_mlp_sa = nn.Sequential(
-            nn.Linear(1, 24),
-            nn.ReLU(inplace=True),
-            nn.Linear(24, 48),
-            nn.ReLU(inplace=True),
-            nn.Linear(48, 32),
-        )
-
-        self.layer_mlp_md = nn.Sequential(
-            nn.Linear(1, 24),
-            nn.ReLU(inplace=True),
-            nn.Linear(24, 48),
-            nn.ReLU(inplace=True),
-            nn.Linear(48, 32),
-        )
-
-        self.layer_mlp_za = nn.Sequential(
-            nn.Linear(2, 24),
-            nn.ReLU(inplace=True),
-            nn.Linear(24, 48),
-            nn.ReLU(inplace=True),
-            nn.Linear(48, 32),
-        )
-
-        # self.layer_mlp_ll = nn.Sequential(
-        #     nn.Linear(2, 24),
-        #     nn.ReLU(inplace=True),
-        #     nn.Linear(24, 48),
-        #     nn.ReLU(inplace=True),
-        #     nn.Linear(48, 32),
-        # )
-
-        self.layer_mlp_ll = nn.Sequential(
-            nn.Linear(2, 48),
-            nn.ReLU(inplace=True),
-            nn.Linear(48, 96),
-            nn.ReLU(inplace=True),
-            nn.Linear(96, 160),
-        )
-
-        self.layer_mlp_sza = nn.Sequential(
-            nn.Linear(2, 24),
-            nn.ReLU(inplace=True),
-            nn.Linear(24, 48),
-            nn.ReLU(inplace=True),
-            nn.Linear(48, 32),
-        )
-
-        # self.layer_mlp5 = nn.Sequential(
-        #     nn.Linear(2, 48),
-        #     nn.ReLU(inplace=True),
-        #     nn.Linear(48, 96),
-        #     nn.ReLU(inplace=True),
-        #     nn.Linear(96, 128),
-        # )
-
-        #
-        self.final_proj0 = nn.Sequential(
-            nn.Linear(160, 160),
-            nn.ReLU(inplace=True),
-            nn.Linear(160, 96),
-        )
-
-        self.final_proj1 = nn.Sequential(
-            nn.Linear(160, 160),
-            nn.ReLU(inplace=True),
-            nn.Linear(160, 96),
-        )
-
-        self.final_proj2 = nn.Sequential(
-            nn.Linear(160, 160),
-            nn.ReLU(inplace=True),
-            nn.Linear(160, 192),
-        )
-
-        self.final_proj3 = nn.Sequential(
-            nn.Linear(160, 160),
-            nn.ReLU(inplace=True),
-            nn.Linear(160, 384),
-        )
-
-        self.final_proj4 = nn.Sequential(
-            nn.Linear(160, 160),
-            nn.ReLU(inplace=True),
-            nn.Linear(160, 768),
-        )
-
-
-    def forward(self, metas, meta_view_mode):
-        """
-        meta_infos: 包含 [分辨率, 时间] 等连续属性
-        """
-
-        # meta_raw_sm = torch.cat((metas['stereo_angle'].unsqueeze(0),
-        #                       metas['month_diff'].unsqueeze(0),
-        #                       ), 1)
-        #
-        meta_raw_ll = torch.cat((
-                              metas[meta_view_mode + '_lat'].unsqueeze(0),
-                              metas[meta_view_mode + '_lon'].unsqueeze(0)
-                              ), 1)
-
-        # meta_raw_za = torch.cat((
-        #                       metas[meta_view_mode + '_zenith'].unsqueeze(0),
-        #                       metas[meta_view_mode + '_azimuth'].unsqueeze(0)
-        #                       ), 1)
-        #
-        #
-        # meta_raw_sza = torch.cat((
-        #                       metas[meta_view_mode + '_sunzenith'].unsqueeze(0),
-        #                       metas[meta_view_mode + '_sunazimuth'].unsqueeze(0)
-        #                       ), 1)
-        #
-        # meta_raw_sa = metas['stereo_angle'].unsqueeze(0)
-        # meta_raw_md = metas['month_diff'].unsqueeze(0)
-
-
-        meta_mlp_ll = self.layer_mlp_ll(meta_raw_ll)
-        # meta_mlp_sa = self.layer_mlp_sa(meta_raw_sa)
-        # meta_mlp_md = self.layer_mlp_md(meta_raw_md)
-        # meta_mlp_za = self.layer_mlp_za(meta_raw_za)
-        # meta_mlp_sza = self.layer_mlp_sza(meta_raw_sza)
-
-        # # # 拼接 (B, embed_dim)
-        # meta_cat = torch.cat([meta_mlp_sm, meta_mlp_za, meta_mlp_sza, meta_mlp_ll], dim=-1)
-        # meta_cat = torch.cat([meta_mlp_sa, meta_mlp_md, meta_mlp_za, meta_mlp_sza, meta_mlp_ll], dim=-1)
-        meta_cat = meta_mlp_ll
-        # meta_cat = torch.cat([meta_mlp_sm], dim=-1)
-        # #
-        # # # 再映射到 (B, embed_dim)
-        meta_vec0 = self.final_proj0(meta_cat).unsqueeze(2)
-        meta_vec1 = self.final_proj1(meta_cat).unsqueeze(2)
-        meta_vec2 = self.final_proj2(meta_cat).unsqueeze(2)
-        meta_vec3 = self.final_proj3(meta_cat).unsqueeze(2)
-        meta_vec4 = self.final_proj4(meta_cat).unsqueeze(2)
-        # meta_token = meta_vec.repeat(1, 1, 256).view(1, 256 * 256, 1)
-        #
-        # # 增加一个 Token 维度: (B, 1, embed_dim)
-        B, _, _ = meta_vec1.shape
-        meta_token0 = meta_vec0.view(B, 1, self.embed_dim*2)
-        meta_token1 = meta_vec1.view(B, 1, self.layer_dim[3]*2)
-        meta_token2 = meta_vec2.view(B, 1, self.layer_dim[2]*2)
-        meta_token3 = meta_vec3.view(B, 1, self.layer_dim[1]*2)
-        meta_token4 = meta_vec4.view(B, 1, self.layer_dim[0]*2)
-
-        return [meta_token0, meta_token1, meta_token2, meta_token3, meta_token4]
-
 
 class ModalEncoder(nn.Module):
     def __init__(self, cfgs):
@@ -796,182 +612,70 @@ class ModalEncoder(nn.Module):
 
         self.embed_dim = self.cfgs.MODEL.SET.BM.FEATEXTRACT.EMBED_DIM
 
-        # self.layer_mlp_sa = nn.Sequential(
-        #     nn.Linear(1, 24),
-        #     nn.ReLU(inplace=True),
-        #     nn.Linear(24, 48),
-        #     nn.ReLU(inplace=True),
-        #     nn.Linear(48, 32),
-        # )
-        #
-        # self.layer_mlp_md = nn.Sequential(
-        #     nn.Linear(1, 24),
-        #     nn.ReLU(inplace=True),
-        #     nn.Linear(24, 48),
-        #     nn.ReLU(inplace=True),
-        #     nn.Linear(48, 32),
-        # )
-        #
-        # self.final_proj = nn.Sequential(
-        #     nn.Linear(64, 128),
-        #     nn.ReLU(inplace=True),
-        #     nn.Linear(128, 256),
-        # )
+        # # Our WHU-GF7-SSIDE
 
-
-        # US3D
-        self.layer_mlp5 = nn.Sequential(
-            nn.Linear(2, 48),
+        self.layer_mlp_za = nn.Sequential(
+            nn.Linear(2, 32),
             nn.ReLU(inplace=True),
-            nn.Linear(48, 96),
+            nn.Linear(32, 64),
             nn.ReLU(inplace=True),
-            nn.Linear(96, 128),
+            nn.Linear(64, 32),
         )
-        # self.layer_mlp_samd = nn.Sequential(
-        #     nn.Linear(2, 32),
-        #     nn.ReLU(inplace=True),
-        #     nn.Linear(32, 64),
-        #     nn.ReLU(inplace=True),
-        #     nn.Linear(64, 32),
-        # )
-        #
-        # self.layer_mlp_za = nn.Sequential(
-        #     nn.Linear(2, 32),
-        #     nn.ReLU(inplace=True),
-        #     nn.Linear(32, 64),
-        #     nn.ReLU(inplace=True),
-        #     nn.Linear(64, 32),
-        # )
-        #
-        # self.layer_mlp_ll = nn.Sequential(
-        #     nn.Linear(2, 32),
-        #     nn.ReLU(inplace=True),
-        #     nn.Linear(32, 64),
-        #     nn.ReLU(inplace=True),
-        #     nn.Linear(64, 32),
-        # )
-        #
-        # self.layer_mlp_sza = nn.Sequential(
-        #     nn.Linear(2, 32),
-        #     nn.ReLU(inplace=True),
-        #     nn.Linear(32, 64),
-        #     nn.ReLU(inplace=True),
-        #     nn.Linear(64, 32),
-        # )
+        self.layer_mlp_ll = nn.Sequential(
+            nn.Linear(2, 32),
+            nn.ReLU(inplace=True),
+            nn.Linear(32, 64),
+            nn.ReLU(inplace=True),
+            nn.Linear(64, 32),
+        )
+        self.layer_mlp_sza = nn.Sequential(
+            nn.Linear(2, 32),
+            nn.ReLU(inplace=True),
+            nn.Linear(32, 64),
+            nn.ReLU(inplace=True),
+            nn.Linear(64, 32),
+        )
+
+
 
         self.final_proj = nn.Sequential(
-            nn.Linear(128, 128),
+            nn.Linear(96, 128),
             nn.ReLU(inplace=True),
             nn.Linear(128, 256),
         )
 
 
-        # # Our WHU-GF7-SSIDE
-        #
-        # self.layer_mlp_za = nn.Sequential(
-        #     nn.Linear(2, 32),
-        #     nn.ReLU(inplace=True),
-        #     nn.Linear(32, 64),
-        #     nn.ReLU(inplace=True),
-        #     nn.Linear(64, 32),
-        # )
-        # self.layer_mlp_ll = nn.Sequential(
-        #     nn.Linear(2, 32),
-        #     nn.ReLU(inplace=True),
-        #     nn.Linear(32, 64),
-        #     nn.ReLU(inplace=True),
-        #     nn.Linear(64, 32),
-        # )
-        # self.layer_mlp_sza = nn.Sequential(
-        #     nn.Linear(2, 32),
-        #     nn.ReLU(inplace=True),
-        #     nn.Linear(32, 64),
-        #     nn.ReLU(inplace=True),
-        #     nn.Linear(64, 32),
-        # )
-        #
-        #
-        #
-        # self.final_proj = nn.Sequential(
-        #     nn.Linear(96, 128),
-        #     nn.ReLU(inplace=True),
-        #     nn.Linear(128, 256),
-        # )
-
-
-        # Our WHU-GF7-SSIDE
-
-        # self.layer_mlp_ll = nn.Sequential(
-        #     nn.Linear(2, 32),
-        #     nn.ReLU(inplace=True),
-        #     nn.Linear(32, 64),
-        #     nn.ReLU(inplace=True),
-        #     nn.Linear(64, 96),
-        # )
-        #
-        # self.final_proj = nn.Sequential(
-        #     nn.Linear(96, 128),
-        #     nn.ReLU(inplace=True),
-        #     nn.Linear(128, 256),
-        # )
 
     def forward(self, metas, meta_view_mode):
         """
         meta_infos: 包含 [分辨率, 时间] 等连续属性
         """
-        # # Our WHU-GF7-SSIDE
-        # meta_raw_ll = torch.cat((
-        #                       metas[meta_view_mode + '_lat'].unsqueeze(0),
-        #                       metas[meta_view_mode + '_lon'].unsqueeze(0)
-        #                       ), 1)
-        # #
-        # meta_raw_za = torch.cat((
-        #                       metas[meta_view_mode + '_zenith'].unsqueeze(0),
-        #                       metas[meta_view_mode + '_azimuth'].unsqueeze(0)
-        #                       ), 1)
+        # Our WHU-GF7-SSIDE
+        meta_raw_ll = torch.cat((
+                              metas[meta_view_mode + '_lat'].unsqueeze(0),
+                              metas[meta_view_mode + '_lon'].unsqueeze(0)
+                              ), 1)
         #
-        # meta_raw_sza = torch.cat((
-        #                       metas[meta_view_mode + '_sunzenith'].unsqueeze(0),
-        #                       metas[meta_view_mode + '_sunazimuth'].unsqueeze(0)
-        #                       ), 1)
+        meta_raw_za = torch.cat((
+                              metas[meta_view_mode + '_zenith'].unsqueeze(0),
+                              metas[meta_view_mode + '_azimuth'].unsqueeze(0)
+                              ), 1)
 
-        # US3D
-        # meta_raw_sa = metas['stereo_angle'].unsqueeze(0)
-        # meta_raw_md = metas['month_diff'].unsqueeze(0)
-
-        meta_raw_samd = torch.cat((
-                              metas['stereo_angle'].unsqueeze(0),
-                              metas['month_diff'].unsqueeze(0)
+        meta_raw_sza = torch.cat((
+                              metas[meta_view_mode + '_sunzenith'].unsqueeze(0),
+                              metas[meta_view_mode + '_sunazimuth'].unsqueeze(0)
                               ), 1)
 
 
-        # meta_mlp_ll = self.layer_mlp_ll(meta_raw_ll)
-        # meta_mlp_za = self.layer_mlp_za(meta_raw_za)
-        # meta_mlp_sza = self.layer_mlp_sza(meta_raw_sza)
-        # meta_mlp_samd = self.layer_mlp_samd(meta_raw_samd)
-        # meta_mlp_sa = self.layer_mlp_sa(meta_raw_sa)
-        # meta_mlp_md = self.layer_mlp_md(meta_raw_md)
-        meta_mlp_samd = self.layer_mlp5(meta_raw_samd)
-        meta_vec = self.final_proj(meta_mlp_samd).unsqueeze(2)
+
+
+        meta_mlp_ll = self.layer_mlp_ll(meta_raw_ll)
+        meta_mlp_za = self.layer_mlp_za(meta_raw_za)
+        meta_mlp_sza = self.layer_mlp_sza(meta_raw_sza)
+
+        meta_cat = torch.cat([meta_mlp_za, meta_mlp_sza, meta_mlp_ll], dim=-1)
+        meta_vec = self.final_proj(meta_cat).unsqueeze(2)
         meta_token = meta_vec.repeat(1, 1, 256).view(1, 256 * 256, 1)
-
-
-        # # # 拼接 (B, embed_dim)
-        # meta_cat = torch.cat([meta_mlp_za, meta_mlp_sza, meta_mlp_ll], dim=-1)
-        # meta_cat = torch.cat([meta_mlp_sa, meta_mlp_md], dim=-1)
-        # meta_cat = torch.cat([meta_mlp_sa, meta_mlp_md, meta_mlp_za, meta_mlp_sza, meta_mlp_ll], dim=-1)
-        # meta_cat = torch.cat([meta_mlp_samd, meta_mlp_za, meta_mlp_sza, meta_mlp_ll], dim=-1)
-        # meta_cat = torch.cat([meta_mlp_ll], dim=-1)
-        # meta_cat = torch.cat([meta_mlp_sza], dim=-1)
-        # meta_cat = torch.cat([meta_mlp_sm], dim=-1)
-        # #
-        # # # # 再映射到 (B, embed_dim)
-        # meta_vec = self.final_proj(meta_cat).unsqueeze(2)
-        # meta_token = meta_vec.repeat(1, 1, 256).view(1, 256 * 256, 1)
-        #
-        # # # 增加一个 Token 维度: (B, 1, embed_dim)
-        # B, _, _ = meta_vec.shape
-        # meta_token = meta_vec.view(B, 1, self.embed_dim)
 
         return meta_token
 

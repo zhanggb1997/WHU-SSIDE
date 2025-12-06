@@ -3,10 +3,10 @@ Project    : RSDetec
 FileName   : main_dm .py
 CreateTime : 2023/8/25 
 =======================
-@CopyRight : WHU-星光团队
-@Author    : 弓长广文武
+@CopyRight : WHU
+@Author    : Zhang
 @Contact   : zhanggb1997@163.com
-@Content   : # 实现内容 #
+@Content   : # Implementation Content #
 '''
 import os
 import random
@@ -19,8 +19,9 @@ from core.DM_core.DM_train import TrainDM
 from models.DM_models.Meta_MRGE.Meta_MRGE import MetaMRGE
 from utils.log import logS
 
-
-#################  配置超参数  #########################
+# =========================================================================
+# 1. Hyperparameter Configuration
+# =========================================================================
 parser = argparse.ArgumentParser()
 parser.add_argument("--cfgs", type=str, default=[
     # data
@@ -42,39 +43,28 @@ parser.add_argument("--cfgs", type=str, default=[
 ], help="Paths of programme configure files")
 
 args = parser.parse_args()
-# 打印args信息
 print(args.cfgs)
-# 将配置文件载入进行更新
 update_configs(CN_=CN_, cfgs_path=args.cfgs)
-#################  环境配置  #########################
-# 随机种子设定
-seed = CN_.SEED  # 随机种子设定
-torch.manual_seed(seed)  # 固定随机种子
-torch.cuda.manual_seed(seed)  # 固定随机种子
-torch.cuda.manual_seed_all(seed)  # 固定随机种子
-numpy.random.seed(seed)  # 固定随机种子
+
+# =========================================================================
+# 2. Environment Configuration
+# =========================================================================
+seed = CN_.SEED
+torch.manual_seed(seed)
+torch.cuda.manual_seed(seed)
+torch.cuda.manual_seed_all(seed)
+numpy.random.seed(seed)
 random.seed(seed)
-# cuDNN设置
+
 CUDNN = CN_.CUDNN
-torch.backends.cudnn.determinstic = CUDNN.DETERMINSTIC  # 保证可重复性
-torch.backends.cudnn.enabled = CUDNN.ENABLED  # 提升计算速率
-torch.backends.cudnn.benchmark = CUDNN.BENCHMARK  # 提升计算速率
+torch.backends.cudnn.determinstic = CUDNN.DETERMINSTIC
+torch.backends.cudnn.enabled = CUDNN.ENABLED
+torch.backends.cudnn.benchmark = CUDNN.BENCHMARK
 
-# # 多GPU设定
-# torch.cuda.set_device(args.local_rank)
-# 调用torch.distributed下任何函数前，必须运行torch.distributed.init_process_group(backend='nccl')初始化
-# 1.pytorch支持的通讯后端，2.各级器间的通讯方式，单机就是localhost
-# 3.rank标识主机和从机，只有一个主机则设定为0，4.world_size标识多少主机，只有一个主机设定为1
-# torch.distributed.init_process_group(backend='nccl', init_method='tcp://localhost:23456', rank=0, world_size=1)
-
-# #################  输出Flag  #########################
-if CN_.GPUS == torch.cuda.device_count():
-    logS.info("成功检测到 {} 个GPU！".format(CN_.GPUS))
-else:
-    logS.warning("没有检测到GPU/GPU设定数量不对！")
-
-#################  配置模型  #########################
-# model = HMSMNetOri(CN_)
+# =========================================================================
+# 3. Model Configuration
+# =========================================================================
+# model = HMSMNet(CN_)
 # model = CSTR(CN_)
 # model = STTR(CN_)
 # model = PCWNet(CN_, True)
@@ -85,25 +75,21 @@ else:
 model = MetaMRGE(CN_)
 # stat(model, (1, 1024, 1024))
 
-#################  开始训练-测试预测  #########################
+# =========================================================================
+# 4. Execution Logic (Train / Test / Predict)
+# =========================================================================
 if ('train' in CN_.MODE) or ('Train' in CN_.MODE):
-    # 训练
     train_env = TrainDM(CN_, model)
     train_env.train_model()
-    # 预测
     test_env = TestDM(CN_, model)
     test_env.test_model()
 
-#################  只进行预测  #########################
 elif ('pred' in CN_.MODE) or ('Pred' in CN_.MODE):
-    assert os.path.exists(CN_.RESUME.CKPT_DIR), "您输入的预训练权重不存在！"
-    # 加载权重
+    assert os.path.exists(CN_.RESUME.CKPT_DIR), "The provided pretrained weight path does not exist!"
     test_env = TestDM(CN_, model)
     test_env.test_model()
 
-#################  只进行评估  #########################
 elif ('calcul' in CN_.MODE) or ('Calcul' in CN_.MODE):
-    # 加载权重
     test_env = TestDM(CN_, model)
     test_env.calculate_precise()
 

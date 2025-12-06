@@ -26,18 +26,18 @@ class RSImage:
         # 读取rpc模型
         if self.rpc_path:
             # rpc.txt
-            if isinstance(self.rpc_path, str) and self.rpc_path.endswith('.txt'):  # path to an RPC file 如果是rpc.txt的路径文件
+            if isinstance(self.rpc_path, str) and self.rpc_path.endswith('.txt'):  # path to an RPC file
                 self.rpc_model = rpcm.rpc_from_rpc_file(self.rpc_path)
-            # 未来实现rpb
+
             elif isinstance(self.rpc_path, dict):  # RPC dict in 'rpcm' format
-                self.rpc_model = rpcm.RPCModel(self.rpc_path, dict_format='rpcm')  # 根据RPC dict解析rpc
+                self.rpc_model = rpcm.RPCModel(self.rpc_path, dict_format='rpcm')  #
             else:
                 raise NotImplementedError('rpc of type {} not supported'.format(type(self.rpc_path)))
         else:
-            self.rpc_model = rpcm.rpc_from_geotiff(self.img_path)  # 根据tiff进行解析rpc
+            self.rpc_model = rpcm.rpc_from_geotiff(self.img_path)
 
 
-        # 读取img信息
+
         if self.img_path:
             self.img = rasterio.open(self.img_path)
             self.bands = self.img.count
@@ -48,11 +48,11 @@ class RSImage:
             self.geoprojc = self.img.crs
 
 
-        # 读取xml信息
+
         if self.xml_path:
             xmls = xml.dom.minidom.parse(xml_path)
 
-            # 影像元信息
+
             if xmls.getElementsByTagName('SatelliteID'):
                 self.satellite = xmls.getElementsByTagName('SatelliteID')[0].firstChild.data
             if xmls.getElementsByTagName('SensorID'):
@@ -63,7 +63,6 @@ class RSImage:
                 except Exception as e:
                     self.date = xmls.getElementsByTagName('StartTime')[0].firstChild.data
 
-            # 四个顶点的维度经度
             if xmls.getElementsByTagName('TopLeftLatitude'):
                 self.TLlat = float(xmls.getElementsByTagName('TopLeftLatitude')[0].firstChild.data)
                 self.TLlon = float(xmls.getElementsByTagName('TopLeftLongitude')[0].firstChild.data)
@@ -180,14 +179,7 @@ class RSImage:
 
 
     def standardization(self, img):
-        # # # # # ========== std mean 方式
-        # mean_value = np.nanmean(img)
-        # std_value = np.nanstd(img)
-        # min_value = mean_value - std_value * 2
-        # max_value = mean_value + std_value * 2
-        # img_ = np.clip(img, min_value, max_value)
-        # img_ = ((img_ - min_value) / (max_value - min_value) * 255).astype(np.uint8)
-        # # # # ========== 2% 98% 方式
+
         min_value, max_value = np.percentile(img, (2, 98))
         img_ = np.clip(img, min_value, max_value)
         img_ = ((img_ - min_value) / (max_value - min_value) * 255).astype(np.uint8)

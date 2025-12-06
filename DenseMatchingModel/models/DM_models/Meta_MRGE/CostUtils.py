@@ -29,7 +29,6 @@ def conv2d_bn(inchannels,filters, kernel_size, strides, padding, dilation_rate, 
 
 
 
-## 代价构建
 class CostConcatenation(nn.Module):
     def __init__(self, min_disp=-112.0, max_disp=16.0):
         super(CostConcatenation, self).__init__()
@@ -51,7 +50,6 @@ class CostConcatenation(nn.Module):
 
 
 
-## 代价聚合
 alpha = 0.2
 
 

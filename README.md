@@ -64,7 +64,8 @@ WHU-SSIDE/
 ├── 📦 Dataset/                    # Dense matching dataset (cloud storage links)
 │   ├── download_links.md          # Dataset download instructions
 │   ├── dataset_structure.md       # Dataset structure documentation
-│   └── usage_guidelines.md        # Usage guidelines
+│   ├── metadata_example.md        # Example of meta data
+│   └── data_example.png           # Example of satellite stereo image pairs 
 |
 ├── 🔧 StereoDatasetConstruction/  # Dataset construction code
 │   ├── rpc/                       # RPC model utils code

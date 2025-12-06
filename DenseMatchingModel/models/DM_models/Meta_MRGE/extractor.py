@@ -1,7 +1,6 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from models.DM_models.IGEV.submodule import *
 import timm
 
 
@@ -320,48 +319,4 @@ class SubModule(nn.Module):
                 m.weight.data.fill_(1)
                 m.bias.data.zero_()
 
-
-class Feature(SubModule):
-    def __init__(self):
-        super(Feature, self).__init__()
-        pretrained = True
-        pretrained_cfg_overlay = {'file': r"/root/autodl-tmp/pytorch_model.bin"}
-        model = timm.create_model('mobilenetv2_100', pretrained=pretrained, pretrained_cfg_overlay=pretrained_cfg_overlay, features_only=True)
-        layers = [1,2,3,5,6]
-        chans = [16, 24, 32, 96, 160]
-        self.conv_stem = model.conv_stem
-        # 调整第一个卷积层的权重：取3通道的平均值作为单通道权重
-        pretrained_state_dict = self.conv_stem.state_dict()
-        conv_stem_weight = pretrained_state_dict['weight']
-        adjusted_weight = conv_stem_weight.mean(dim=1, keepdim=True)
-        self.conv_stem.weight = nn.Parameter(adjusted_weight)
-
-        self.bn1 = model.bn1
-        # self.act1 = model.act1
-        self.act1 = nn.ReLU()
-
-        self.block0 = torch.nn.Sequential(*model.blocks[0:layers[0]])
-        self.block1 = torch.nn.Sequential(*model.blocks[layers[0]:layers[1]])
-        self.block2 = torch.nn.Sequential(*model.blocks[layers[1]:layers[2]])
-        self.block3 = torch.nn.Sequential(*model.blocks[layers[2]:layers[3]])
-        self.block4 = torch.nn.Sequential(*model.blocks[layers[3]:layers[4]])
-
-        self.deconv32_16 = Conv2x(chans[4], chans[3], deconv=True, concat=True)
-        self.deconv16_8 = Conv2x(chans[3]*2, chans[2], deconv=True, concat=True)
-        self.deconv8_4 = Conv2x(chans[2]*2, chans[1], deconv=True, concat=True)
-        self.conv4 = BasicConv(chans[1]*2, chans[1]*2, kernel_size=3, stride=1, padding=1)
-
-    def forward(self, x):
-        x = self.act1(self.bn1(self.conv_stem(x)))
-        x2 = self.block0(x)
-        x4 = self.block1(x2)
-        x8 = self.block2(x4)
-        x16 = self.block3(x8)
-        x32 = self.block4(x16)
-
-        x16 = self.deconv32_16(x32, x16)
-        x8 = self.deconv16_8(x16, x8)
-        x4 = self.deconv8_4(x8, x4)
-        x4 = self.conv4(x4)
-        return [x4, x8, x16, x32]
 

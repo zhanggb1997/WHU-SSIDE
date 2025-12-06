@@ -178,11 +178,7 @@ class FeatureAtt(nn.Module):
         return cv
 
 def context_upsample(disp_low, up_weights):
-    ###
-    # cv (b,1,h,w)
-    # sp (b,9,4*h,4*w)
-    ###
-    b, c, h, w = disp_low.shape       
+    b, c, h, w = disp_low.shape
     disp_unfold = F.unfold(disp_low.reshape(b,c,h,w),3,1,1).reshape(b,-1,h,w)
     disp_unfold = F.interpolate(disp_unfold,(h*4,w*4),mode='nearest').reshape(b,9,h*4,w*4)
     disp = (disp_unfold*up_weights).sum(dim=1,keepdim=True)      
