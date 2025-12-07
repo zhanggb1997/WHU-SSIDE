@@ -1,0 +1,19 @@
+
+GPUS: 1  # GPU???
+FLAG: 'Seed0_Meta_MRGE'  # FLag title
+MODE: "train"  # train or pred
+
+TRAIN:
+  START_EPOCH: 1
+
+################
+#RESUME:
+#  CKPT_DIR: '../Seed0_Meta_MRGE.pth'
+#  INIT_LR_DECAY: True
+#  INIT_BESTLOSS: True
+#  INIT_EPOCHES: True
+
+CUDNN:
+  BENCHMARK: true  # 提升计算速率
+  ENABLED: true # 提升计算速率
+  DETERMINSTIC: false  # 是否保证可复现性
