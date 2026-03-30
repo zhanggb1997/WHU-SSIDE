@@ -20,9 +20,6 @@ WHU-SSIDE is a comprehensive project focused on satellite stereo image disparity
 
 [Dataset-google drive](https://drive.google.com/drive/folders/1-E1LT_HW_qB0g7gqBh4wKPQskVMuzM85?usp=sharing)
 
-[Dataset-baidu netdisk (百度网盘)](https://pan.baidu.com/s/1EFb0GjTrHj38thRKgJm-ow)    Access code: `whus`
-
-
 #### 🚀 Meta-MRGE Algorithm 
 
 *Metadata Guidance*:   Embeds satellite imaging parameters to guide high-precision disparity estimation
