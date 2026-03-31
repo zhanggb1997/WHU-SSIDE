@@ -95,8 +95,6 @@ WHU-SSIDE/
 
 [Dataset-google drive](https://drive.google.com/drive/folders/1-E1LT_HW_qB0g7gqBh4wKPQskVMuzM85?usp=sharing)
 
-[Dataset-baidu drive](https://pan.baidu.com/s/1EFb0GjTrHj38thRKgJm-ow)    Access code: `whus`
-
 
 #### 2. Environment Setup
 
